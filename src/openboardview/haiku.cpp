@@ -27,14 +27,26 @@ class FileFilter: public BRefFilter
 		int len = strlen(ref->name);
 		if (S_ISDIR(stat->st_mode))
 			return true;
-		if (!strcmp(mimeType, "application/zip"))
+		if(len > 2 && !strcasecmp(ref->name + len - 3, ".fz"))
 			return true;
-		if (!strcasecmp(ref->name, "main.lua") ||
-			!strcasecmp(ref->name, "main3.lua"))
-			return true;
-		if (len > 3 &&
-			(!strcasecmp(ref->name + len - 4, ".idf") ||
-			!strcasecmp(ref->name + len - 4, ".zip")))
+		if (len > 3) {
+			const char *ext = ref->name + len - 4;
+			if (!strcasecmp(ext, ".asc") ||
+				!strcasecmp(ext, ".bom") ||
+				
+				!strcasecmp(ext, ".cae") ||
+				!strcasecmp(ext, ".adf") ||
+				!strcasecmp(ext, ".cad") ||
+				!strcasecmp(ext, ".cae") ||
+				!strcasecmp(ext, ".cst") ||
+				!strcasecmp(ext, ".brd") ||
+				!strcasecmp(ext, ".bdv") ||
+				!strcasecmp(ext, ".bvr") ||
+				!strcasecmp(ext, ".xzz") ||
+				!strcasecmp(ext, ".pcb"))
+				return true;
+		}
+		if (len > 7 && !strcasecmp(ref->name + len - 8, ".pcbdoc"))
 			return true;
 		return false;
 	}
@@ -125,15 +137,4 @@ const filesystem::path show_file_picker(bool filterBoards){
     return std::string(path);
 }
 
-extern "C" char *appdir(void);
-
-char *appdir(void)
-{
-	static char dir[PATH_MAX] = "";
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, -1, false, dir, sizeof(dir)) != B_OK)
-		sprintf(dir, "/boot/home/config/settings");
-	strncat(dir, "/Instead", sizeof(dir));
-	dir[sizeof(dir) - 1] = 0;
-	return dir;
-}
 #endif
